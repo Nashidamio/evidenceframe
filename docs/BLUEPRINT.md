@@ -1,6 +1,6 @@
-# EvidenceFrame — Project blueprint (draft)
+# EvidenceFrame — Complete first-release blueprint
 
-Status: planning draft, 15 November 2026. This is an independent portfolio prototype, not a Quantigo AI product or an account of its internal systems.
+Status: first-release scope set, 15 November 2026. This is an independent portfolio prototype, not a Quantigo AI product or an account of its internal systems.
 
 ## 1. Problem and user
 
@@ -37,18 +37,18 @@ An interval is a piece of the video that supports or challenges the answer. The 
 
 For a small example, a 12-second clip might show a pen placed on a book at seconds 4–7. If the question asks what was placed on the book, 4–7 is an evidence interval. A question requiring events at 5 seconds and 40 seconds needs two intervals.
 
-## 4. MVP boundaries
+## 4. Complete first-release boundaries
 
-**Must ship for the portfolio demo**
-- Prepared sample video with documented ownership or reuse permission and at least three candidate items: supported, deliberately wrong, and ambiguous.
+**Release 1 must ship before it goes on the CV**
+- Prepared 45–60 second sample video with documented ownership or reuse permission and at least three candidate items: supported, deliberately wrong, and ambiguous. The sample must be usable without upload.
 - Upload option for a visitor's short MP4.
-- Video playback, review form, evidence timestamps, decision, issue type, and reason.
+- Video playback, review form, candidate item ID, proposed answer and alternatives, up to two evidence intervals, decision, issue type, and reason.
 - Validation of required fields and interval order; duration bounds if reliable duration metadata is available.
-- Multiple review rows in the current session, with edit/remove or replace-by-item behavior.
+- Multiple review rows in the current session, with replace-by-item behavior; export and re-import records so a user can continue later.
 - CSV export and simple counts with denominators (e.g., 1 rejected out of 3 reviewed).
 - README with setup, sample provenance, limitations, screenshots, GitHub and live demo links.
 
-**Later, after the complete human workflow**
+**Separate future research extensions; not part of this release**
 - AI-generated candidate questions, video-model assistance, single-frame-versus-multi-frame experiments, two-reviewer agreement/adjudication, persistent accounts/database.
 - The EgoSchema paper's 30-second temporal-certificate criterion is specific to that benchmark. Our short demo will not claim to reproduce EgoSchema or certify long-term understanding.
 
@@ -63,7 +63,7 @@ flowchart TD
     E --> F["Table, counts, CSV"]
 ```
 
-Python + Streamlit renders the interface and runs the validation. `st.session_state` holds temporary review rows for one browser session. Python's CSV tools produce the export. GitHub stores code; Streamlit Community Cloud is the intended public host. There is no database in the MVP. Do not describe session state as permanent storage.
+Python + Streamlit renders the interface and runs the validation. `st.session_state` holds temporary review rows for one browser session. Python's CSV tools produce the export. GitHub stores code; Streamlit Community Cloud is the intended public host. There is no hosted database in Release 1. Export/re-import provides user-controlled continuity; do not describe session state as permanent storage.
 
 ## 6. Demo data and evaluation
 
@@ -75,21 +75,20 @@ A tiny pilot should report raw counts, examples of caught seeded errors, and fai
 
 1. **Existing prototype:** upload, free-text QA, single interval, decision, session rows, CSV. It proves the basic data path, but cannot judge truth.
 2. Add reason and issue type. Test empty and valid cases.
-3. Define sample data, sample clip, and stable item IDs. Make the app usable immediately on opening.
+3. Define sample data, sample clip, answer alternatives, and stable item IDs. Make the app usable immediately on opening.
 4. Support multiple evidence intervals and enforce review rules.
-5. Add replace/edit behavior and a concise summary; verify CSV against on-screen records.
+5. Add replace-by-item behavior, CSV import/export, and a concise summary; verify CSV against on-screen records.
 6. Document data provenance, limitations, setup, and screenshots.
 7. Deploy, open the public demo in a signed-out browser, test an end-to-end review, and add links to README/CV.
 
 **Definition of done:** A stranger can open the public link, review a prepared candidate without supplying their own clip, explain the evidence, export the result, and understand the code and limitations from the README.
 
-## 8. Open design decisions
+## 8. Working decisions
 
-- Sample clip: self-recorded real actions (recommended) or explicitly synthetic AI video?
-- Candidate format: free-text proposed answer for MVP, or multiple choice with distractors now?
-- For MVP, should a rejected item require an issue type and correction, or issue type and reason only?
-
-These decisions should be made before expanding the form further.
+- Use a self-recorded non-sensitive action sequence as the primary sample. If that proves impractical, use a clearly identified synthetic clip with publication rights.
+- Include proposed answer and alternatives in the prepared candidate items; the current free-text form is only a prototype.
+- Require issue type and reason for a rejected or uncertain item; a corrected answer can be entered when available.
+- Complete this bounded release, including a signed-out demo test, before listing EvidenceFrame on a CV.
 
 ## Sources
 
