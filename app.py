@@ -1,4 +1,11 @@
+import csv
+from io import StringIO
+
 import streamlit as st
+
+# Keep reviews while this browser session is active.
+if "reviews" not in st.session_state:
+    st.session_state.reviews = []
 
 st.title("EvidenceFrame")
 st.write("Check whether a video supports a proposed answer.")
@@ -14,16 +21,38 @@ if video is not None:
     st.video(video)
 
 if st.button("Record review"):
-    if video is None or not question or not answer:
+    if video is None or not question.strip() or not answer.strip():
         st.error("Video, question, and answer are required.")
     elif end <= start:
         st.error("End time must be later than start time.")
     else:
-        st.success("Valid review!")
-        st.write({
-            "question": question,
-            "answer": answer,
+        review = {
+            "video": video.name,
+            "question": question.strip(),
+            "answer": answer.strip(),
             "evidence_start": start,
             "evidence_end": end,
             "decision": decision,
-        })
+        }
+        st.session_state.reviews.append(review)
+        st.success("Review recorded!")
+
+if st.session_state.reviews:
+    st.subheader("Recorded reviews")
+    st.dataframe(st.session_state.reviews)
+
+    output = StringIO()
+    columns = [
+        "video", "question", "answer",
+        "evidence_start", "evidence_end", "decision"
+    ]
+    writer = csv.DictWriter(output, fieldnames=columns)
+    writer.writeheader()
+    writer.writerows(st.session_state.reviews)
+
+    st.download_button(
+        "Download reviews as CSV",
+        data=output.getvalue().encode("utf-8-sig"),
+        file_name="evidenceframe_reviews.csv",
+        mime="text/csv",
+    )
