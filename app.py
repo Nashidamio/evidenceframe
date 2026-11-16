@@ -3,7 +3,7 @@ from io import StringIO
 
 import streamlit as st
 
-# Keep reviews while this browser session is active.
+# Reviews remain available while this browser session is active.
 if "reviews" not in st.session_state:
     st.session_state.reviews = []
 
@@ -16,16 +16,31 @@ answer = st.text_input("Proposed answer")
 start = st.number_input("Evidence starts at (seconds)", min_value=0.0)
 end = st.number_input("Evidence ends at (seconds)", min_value=0.0)
 decision = st.selectbox("Decision", ["Approve", "Reject", "Needs review"])
+
+# An issue label makes a negative or uncertain decision actionable.
+issue_type = "None"
+if decision != "Approve":
+    issue_type = st.selectbox(
+        "Issue type",
+        [
+            "Select an issue",
+            "Wrong answer",
+            "Unsupported by video",
+            "Ambiguous question",
+            "Insufficient temporal evidence",
+            "Other",
+        ],
+    )
+
 reason = st.text_area("Why did you make this decision?")
 
-if video is None or not question.strip() or not answer.strip() or not reason.strip():
-    st.error("Video, question, answer, and decision reason are required.")
-
 if st.button("Record review"):
-    if video is None or not question.strip() or not answer.strip():
-        st.error("Video, question, and answer are required.")
+    if video is None or not question.strip() or not answer.strip() or not reason.strip():
+        st.error("Video, question, answer, and decision reason are required.")
     elif end <= start:
         st.error("End time must be later than start time.")
+    elif decision != "Approve" and issue_type == "Select an issue":
+        st.error("Select an issue type for a rejected or uncertain item.")
     else:
         review = {
             "video": video.name,
@@ -34,6 +49,7 @@ if st.button("Record review"):
             "evidence_start": start,
             "evidence_end": end,
             "decision": decision,
+            "issue_type": issue_type,
             "reason": reason.strip(),
         }
         st.session_state.reviews.append(review)
@@ -45,8 +61,14 @@ if st.session_state.reviews:
 
     output = StringIO()
     columns = [
-        "video", "question", "answer",
-        "evidence_start", "evidence_end", "decision","evidence_start", "evidence_end", "decision", "reason"
+        "video",
+        "question",
+        "answer",
+        "evidence_start",
+        "evidence_end",
+        "decision",
+        "issue_type",
+        "reason",
     ]
     writer = csv.DictWriter(output, fieldnames=columns)
     writer.writeheader()
